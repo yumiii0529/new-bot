@@ -31,6 +31,8 @@ cp .env.example .env
   2. 建立新應用程式
   3. 複製 API Key
 
+> 如果你使用部署平台（例如 Railway / Railpack / Render / Heroku），請在平台的環境變量設定中新增 `DISCORD_TOKEN` 和 `BLOXLINK_API_KEY`，而不是只依賴本地 `.env` 文件。
+
 ### 3. 安裝依賴
 
 ```bash

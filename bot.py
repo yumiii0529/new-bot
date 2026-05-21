@@ -9,6 +9,12 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 BLOXLINK_KEY = os.getenv("BLOXLINK_API_KEY")
 
+if not TOKEN or TOKEN == "your_discord_token_here":
+    raise RuntimeError(
+        "DISCORD_TOKEN is not set or invalid. "
+        "Please set the correct Discord bot token in environment variables."
+    )
+
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
