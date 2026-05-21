@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-BLOXLINK_KEY = os.getenv("BLOXLINK_API_KEY")
 
 if not TOKEN or TOKEN == "your_discord_token_here":
     raise RuntimeError(
@@ -19,14 +18,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 client = discord.Client(intents=intents)
-
-# ---------------- Bloxlink 查詢 ----------------
-async def get_roblox_id(discord_id: int):
-    url = f"https://v3.blox.link/developer/discord-to-roblox/{discord_id}"
-    headers = {"Authorization": BLOXLINK_KEY}
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url, headers=headers) as resp:
-            return await resp.json()
 
 # ---------------- 髒話 ----------------
 bad_words = ["幹", "靠北", "機掰", "fuck", "shit"]
@@ -55,34 +46,6 @@ async def on_message(message):
     if msg_content == "你好":
         await message.channel.send("你好哇，親愛的！")
         return
-
-    # ---------------- !查詢 Roblox ----------------
-    if msg_content.startswith("!查詢"):
-        # 支援 @提及或查自己
-        if message.mentions:
-            使用者 = message.mentions[0]
-        else:
-            使用者 = message.author
-
-        data = await get_roblox_id(使用者.id)
-
-        if "robloxId" in data:
-            roblox_id = data["user"]["robloxId"]
-            roblox_username = data["user"]["robloxUsername"]
-            roblox_displayname = data["user"]["robloxDisplayName"]
-
-            embed = discord.Embed(
-                title=f"👤 {使用者.display_name} 的 Roblox 資料",
-                color=discord.Color.green()
-            )
-            embed.add_field(name="使用者名稱", value=roblox_username, inline=True)
-            embed.add_field(name="顯示名稱", value=roblox_displayname, inline=True)
-            embed.add_field(name="Roblox ID", value=roblox_id, inline=False)
-            embed.set_thumbnail(url=f"https://www.roblox.com/headshot-thumbnail/image?userId={roblox_id}&width=420&height=420&format=png")
-
-            await message.channel.send(embed=embed)
-        else:
-            await message.channel.send("❌ 此用戶尚未綁定 Roblox 帳號。")
 
 # ---------------- 歡迎訊息 ----------------
 @client.event

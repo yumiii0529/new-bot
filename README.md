@@ -1,10 +1,9 @@
 # 喵喵 Discord 機器人 🐱
 
-一個可愛的 Discord 機器人，提供 Roblox 帳號查詢、歡迎訊息和互動功能。
+一個可愛的 Discord 機器人，提供歡迎訊息和互動功能。
 
 ## 功能
 
-- 🐾 **Roblox 帳號查詢** - 透過 Bloxlink API 查詢使用者的 Roblox 資料
 - 😺 **歡迎訊息** - 新成員加入時發送可愛的歡迎訊息和貓咪圖片
 - 💬 **髒話回覆** - 友善的方式回覆髒話
 - 👋 **打招呼** - 回應「你好」訊息
@@ -26,12 +25,7 @@ cp .env.example .env
   2. 進入 Bot 頁面，點擊 "Add Bot"
   3. 在 TOKEN 下方點擊 "Copy" 複製 Token
 
-- **BLOXLINK_API_KEY**: 從 [Bloxlink Developer Portal](https://bloxlink.com/developer) 獲取
-  1. 登入或註冊
-  2. 建立新應用程式
-  3. 複製 API Key
-
-> 如果你使用部署平台（例如 Railway / Railpack / Render / Heroku），請在平台的環境變量設定中新增 `DISCORD_TOKEN` 和 `BLOXLINK_API_KEY`，而不是只依賴本地 `.env` 文件。
+> 如果你使用部署平台（例如 Railway / Railpack / Render / Heroku），請在平台的環境變數設定中新增 `DISCORD_TOKEN`，而不是只依賴本地 `.env` 文件。
 
 ### 3. 安裝依賴
 
@@ -54,8 +48,6 @@ python bot.py
 
 ### 命令
 
-- `!查詢` - 查詢你的 Roblox 資料
-- `!查詢 @使用者` - 查詢指定使用者的 Roblox 資料
 - `你好` - 機器人會回應你
 
 ## Discord 機器人設置
