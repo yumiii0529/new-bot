@@ -354,6 +354,157 @@ async def leaderboard(interaction: discord.Interaction):
         embed=embed
     )
 
+# ================= 新增命令 =================
+
+# 幫助命令
+@bot.command(name='help', help='顯示所有可用命令')
+async def help_command(ctx):
+    embed = discord.Embed(
+        title="🤖 機器人命令清單",
+        description="以下是所有可用的命令：",
+        color=discord.Color.blue()
+    )
+    
+    commands_list = [
+        ("!ping", "檢查機器人回應速度"),
+        ("!userinfo [@用戶]", "查看用戶資訊"),
+        ("!serverinfo", "查看伺服器資訊"),
+        ("!roll [數字]", "擲骰子（預設6面）"),
+        ("!guess", "開始猜數字遊戲"),
+        ("!cat", "獲得一張貓貓圖片"),
+        ("!avatar [@用戶]", "獲取用戶頭像"),
+        ("/rank", "查看你的等級"),
+        ("/leaderboard", "查看排行榜"),
+    ]
+    
+    for cmd, desc in commands_list:
+        embed.add_field(name=cmd, value=desc, inline=False)
+    
+    embed.set_footer(text="需要幫助？在命令後加上 --help")
+    await ctx.send(embed=embed)
+
+# Ping 命令
+@bot.command(name='ping', help='檢查機器人回應速度')
+async def ping(ctx):
+    latency = round(bot.latency * 1000)
+    embed = discord.Embed(
+        title="🏓 Pong!",
+        description=f"延遲：{latency}ms",
+        color=discord.Color.green()
+    )
+    await ctx.send(embed=embed)
+
+# 用戶信息命令
+@bot.command(name='userinfo', help='查看用戶資訊')
+async def userinfo(ctx, member: discord.Member = None):
+    if member is None:
+        member = ctx.author
+    
+    embed = discord.Embed(
+        title=f"{member.name} 的資訊",
+        color=discord.Color.random()
+    )
+    embed.set_thumbnail(url=member.avatar.url)
+    embed.add_field(name="用戶ID", value=member.id, inline=False)
+    embed.add_field(name="暱稱", value=member.display_name, inline=False)
+    embed.add_field(name="加入伺服器", value=member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
+    embed.add_field(name="帳號創建時間", value=member.created_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
+    embed.add_field(name="身分組", value=", ".join([role.mention for role in member.roles[1:]]) or "無", inline=False)
+    embed.add_field(name="機器人", value="✅ 是" if member.bot else "❌ 否", inline=False)
+    
+    await ctx.send(embed=embed)
+
+# 伺服器信息命令
+@bot.command(name='serverinfo', help='查看伺服器資訊')
+async def serverinfo(ctx):
+    guild = ctx.guild
+    embed = discord.Embed(
+        title=f"{guild.name} 的資訊",
+        color=discord.Color.random()
+    )
+    embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
+    embed.add_field(name="伺服器ID", value=guild.id, inline=False)
+    embed.add_field(name="擁有者", value=guild.owner.mention, inline=False)
+    embed.add_field(name="成員人數", value=f"{guild.member_count} 人", inline=False)
+    embed.add_field(name="頻道數量", value=f"文字:{len(guild.text_channels)} | 語音:{len(guild.voice_channels)}", inline=False)
+    embed.add_field(name="身分組數量", value=len(guild.roles), inline=False)
+    embed.add_field(name="創建時間", value=guild.created_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
+    
+    await ctx.send(embed=embed)
+
+# 擲骰子命令
+@bot.command(name='roll', help='擲骰子')
+async def roll(ctx, sides: int = 6):
+    if sides < 2:
+        await ctx.send("❌ 骰子至少要2面喔！")
+        return
+    
+    result = random.randint(1, sides)
+    embed = discord.Embed(
+        title="🎲 擲骰子結果",
+        description=f"{ctx.author.mention} 擲出了 **{result}** (1-{sides})",
+        color=discord.Color.gold()
+    )
+    await ctx.send(embed=embed)
+
+# 猜數字遊戲 (全局變量)
+guessing_games = {}
+
+@bot.command(name='guess', help='開始猜數字遊戲')
+async def guess(ctx):
+    user_id = ctx.author.id
+    
+    if user_id in guessing_games:
+        await ctx.send(f"❌ {ctx.author.mention} 你已經有一個進行中的遊戲了！")
+        return
+    
+    secret_number = random.randint(1, 100)
+    guessing_games[user_id] = {
+        'number': secret_number,
+        'attempts': 0,
+        'channel': ctx.channel
+    }
+    
+    embed = discord.Embed(
+        title="🎮 猜數字遊戲開始！",
+        description="我想到了一個 1-100 之間的數字，你能猜出來嗎？\n輸入數字進行猜測，或輸入 'quit' 結束遊戲。",
+        color=discord.Color.purple()
+    )
+    await ctx.send(embed=embed)
+
+# 貓貓圖片命令
+@bot.command(name='cat', help='獲得一張貓貓圖片')
+async def cat(ctx):
+    url = "https://cataas.com/cat"
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                if resp.status == 200:
+                    img_data = await resp.read()
+                    file = discord.File(fp=io.BytesIO(img_data), filename="cat.jpg")
+                    embed = discord.Embed(
+                        title="🐱 貓貓圖片",
+                        color=discord.Color.random()
+                    )
+                    embed.set_image(url="attachment://cat.jpg")
+                    await ctx.send(file=file, embed=embed)
+    except Exception as e:
+        await ctx.send(f"❌ 獲取貓貓圖片失敗：{e}")
+
+# 頭像命令
+@bot.command(name='avatar', help='獲取用戶頭像')
+async def avatar(ctx, member: discord.Member = None):
+    if member is None:
+        member = ctx.author
+    
+    embed = discord.Embed(
+        title=f"{member.name} 的頭像",
+        color=discord.Color.random()
+    )
+    embed.set_image(url=member.avatar.url)
+    embed.set_footer(text=f"點擊上方連結下載頭像")
+    await ctx.send(embed=embed)
+
 # ================= 歡迎訊息 =================
 
 @bot.event
@@ -417,6 +568,19 @@ async def on_member_join(member):
                 await channel.send(
                     f"🎉 歡迎 {member.mention}！"
                 )
+
+# ================= 錯誤處理 =================
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(f"❌ 命令不存在！使用 `!help` 查看所有命令。")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(f"❌ 缺少必要的參數。使用 `!help` 查看命令用法。")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send(f"❌ 參數錯誤。請檢查您的輸入。")
+    else:
+        print(f"錯誤：{error}")
 
 # ================= 啟動 =================
 
