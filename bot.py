@@ -137,7 +137,7 @@ async def announcement(ctx):
 也禁止炸麥、故意吵鬧與干擾他人。
 
 9｜善用標註功能
-禁止隨意 @everyone、
+禁止隨意 @ everyone、
 或大量標註成員造成干擾。
 
 10｜管理團隊保有最終處理權
