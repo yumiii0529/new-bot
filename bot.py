@@ -4,6 +4,7 @@ import random
 import io
 import os
 from dotenv import load_dotenv
+from discord.ext import commands
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -17,7 +18,7 @@ if not TOKEN or TOKEN == "your_discord_token_here":
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 # ---------------- 髒話 ----------------
 bad_words = ["幹", "靠北", "機掰", "fuck", "shit"]
@@ -29,9 +30,9 @@ funny_replies = [
     "你的嘴巴需要洗洗，還是我幫你？🧼"
 ]
 
-@client.event
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
     
     msg_content = message.content.lower()
@@ -46,9 +47,12 @@ async def on_message(message):
     if msg_content == "你好":
         await message.channel.send("你好哇，親愛的！")
         return
+    
+    # 允許指令處理
+    await bot.process_commands(message)
 
 # ---------------- 歡迎訊息 ----------------
-@client.event
+@bot.event
 async def on_member_join(member):
     channel = member.guild.system_channel
     if not channel:
@@ -86,9 +90,19 @@ async def on_member_join(member):
             else:
                 await channel.send(f"🎉 歡迎 {member.mention}！但今天貓貓罷工了 😿")
 
-# ---------------- 啟動 ----------------
-@client.event
-async def on_ready():
-    print(f'🤖 機器人已上線：{client.user}')
+# ---------------- 公告指令 ----------------
+@bot.command(name="公告")
+async def announcement(ctx):
+    await ctx.send("""
+📢 伺服器公告
 
-client.run(TOKEN)
+歡迎來到魅夜貓舍 🐾
+請遵守伺服器規則並友善交流～
+""")
+
+# ---------------- 啟動 ----------------
+@bot.event
+async def on_ready():
+    print(f'🤖 機器人已上線：{bot.user}')
+
+bot.run(TOKEN)
