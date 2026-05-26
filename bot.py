@@ -100,10 +100,10 @@ async def on_member_join(member):
 @bot.command(name="公告")
 async def announcement(ctx):
     await ctx.send("""
-# ☕ 喵舍・店內守則
+# ☕ 貓宅・店內守則
 
 
-## 歡迎來到喵舍 
+## 歡迎來到貓宅 
 
 
 這裡是提供聊天、陪伴、交友與遊戲交流的空間。
